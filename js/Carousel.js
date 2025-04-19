@@ -23,7 +23,7 @@ class Carousel {
 
     #gl;
     #renderer;
-    #renderables;
+    #platform;
     #azimuth;
     #elevation;
     #distance;
@@ -41,57 +41,7 @@ class Carousel {
                         Carousel.#UNIFORM_CAMERA, Carousel.#UNIFORM_MODEL, Carousel.#UNIFORM_LIGHT_AMBIENT,
                         Carousel.#UNIFORM_LIGHT_DIRECTIONAL_COLOR, Carousel.#UNIFORM_LIGHT_DIRECTIONAL_DIRECTION],
                         Carousel.#ATTRIBUTES);
-                const carousel = new Carousel(gl, renderer, [
-                        new Renderable(gl, renderer.attributes, {
-                            positions: [
-                                0, -0.4999999999999998, -0.8660254037844387,
-                                0.7500000000000001, -0.4999999999999998, 0.4330127018922192,
-                                -0.7499999999999998, -0.4999999999999998, 0.43301270189221974,
-                                0, 1, 0,
-                                0, -0.4999999999999998, -0.8660254037844387,
-                                -0.7499999999999998, -0.4999999999999998, 0.43301270189221974,
-                                0, 1, 0,
-                                0.7500000000000001, -0.4999999999999998, 0.4330127018922192,
-                                0, -0.4999999999999998, -0.8660254037844387,
-                                0, 1, 0,
-                                -0.7499999999999998, -0.4999999999999998, 0.43301270189221974,
-                                0.7500000000000001, -0.4999999999999998, 0.4330127018922192
-                            ],
-                            normals: [
-                                0.0, -1.0, 0.0,
-                                0.0, -1.0, 0.0,
-                                0.0, -1.0, 0.0,
-                                -0.7500000000000001, 0.4999999999999998, -0.4330127018922192,
-                                -0.7500000000000001, 0.4999999999999998, -0.4330127018922192,
-                                -0.7500000000000001, 0.4999999999999998, -0.4330127018922192,
-                                0.7499999999999998, 0.4999999999999998, -0.43301270189221974,
-                                0.7499999999999998, 0.4999999999999998, -0.43301270189221974,
-                                0.7499999999999998, 0.4999999999999998, -0.43301270189221974,
-                                0.0, 0.4999999999999998, 0.8660254037844387,
-                                0.0, 0.4999999999999998, 0.8660254037844387,
-                                0.0, 0.4999999999999998, 0.8660254037844387
-                            ],
-                            colors: [
-                                1.0, 0.0, 0.0, 1.0,
-                                1.0, 0.0, 0.0, 1.0,
-                                1.0, 0.0, 0.0, 1.0,
-                                0.0, 1.0, 0.0, 1.0,
-                                0.0, 1.0, 0.0, 1.0,
-                                0.0, 1.0, 0.0, 1.0,
-                                0.0, 0.0, 1.0, 1.0,
-                                0.0, 0.0, 1.0, 1.0,
-                                0.0, 0.0, 1.0, 1.0,
-                                1.0, 1.0, 0.0, 1.0,
-                                1.0, 1.0, 0.0, 1.0,
-                                1.0, 1.0, 0.0, 1.0
-                            ],
-                            indices: [
-                                0, 1, 2,
-                                3, 4, 5,
-                                6, 7, 8,
-                                9, 10, 11
-                            ]
-                        })]);
+                const carousel = new Carousel(gl, renderer, new Platform(gl, renderer.attributes));
                 requestAnimationFrame(carousel.render.bind(carousel));
             })
         });
@@ -106,10 +56,10 @@ class Carousel {
         });
     }
 
-    constructor(gl, renderer, renderables) {
+    constructor(gl, renderer, platform) {
         this.#gl = gl;
         this.#renderer = renderer;
-        this.#renderables = renderables;
+        this.#platform = platform;
         this.azimuth = 0.0;
         this.elevation = 0.0;
         this.distance = Configuration.distance.max;
@@ -210,27 +160,18 @@ class Carousel {
         this.#gl.useProgram(this.#renderer.program);
         this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_PROJECTION], false, this.#projection);
         this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_CAMERA], false, this.#camera);
+        this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false, this.#model);
         this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_AMBIENT], Configuration.light.ambient.color);
         this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_DIRECTIONAL_COLOR],
                 Configuration.light.directional.color);
         this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_DIRECTIONAL_DIRECTION],
                 Configuration.light.directional.direction);
-        const n = 3;
-        const m = 4;
-        const l = 5;
-        for (let i = 0; i < n; i++) {
-            for (let j = 0; j < m; j++) {
-                for (let k = 0; k < l; k++) {
-                    this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false, this.#model(i, j, k));
-                    this.#renderables[(i * m * l + j * l + k) % this.#renderables.length].render();
-                }
-            }
-        }
+        this.#platform.render();
         requestAnimationFrame(this.render.bind(this));
     }
 
     idle(time) {
-    const dt = (time - this.#time) / Carousel.#MS_PER_S;
+        const dt = (time - this.#time) / Carousel.#MS_PER_S;
         this.fps = 1 / dt;
         this.azimuth += this.#velocityAzimuth * dt;
         this.elevation += this.#velocityElevation * dt;
@@ -255,12 +196,9 @@ class Carousel {
         return camera;
     }
 
-    #model(i, j, k) {
+    get #model() {
         const model = mat4.create();
-        mat4.translate(model, model, [2 * i, 2 * j, 2 * k]);
-        mat4.rotateX(model, model, this.rotation * i);
-        mat4.rotateY(model, model, this.rotation * j);
-        mat4.rotateZ(model, model, this.rotation * k);
+        mat4.rotateY(model, model, this.rotation);
         return model;
     }
 }
