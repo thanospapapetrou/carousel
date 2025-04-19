@@ -9,9 +9,9 @@ class Platform extends Renderable {
             const indices = [];
             const n = 11;
             for (let i = 0; i < Configuration.platform.sectors; i++) {
-                const angle = i * 2 * Math.PI / Configuration.platform.sectors;
-                const normalX = Math.cos(angle);
-                const normalZ = Math.sin(angle);
+                const sectorAngle = i * 2 * Math.PI / Configuration.platform.sectors;
+                const normalX = Math.cos(sectorAngle);
+                const normalZ = Math.sin(sectorAngle);
                 const baseX = normalX * Configuration.platform.base.radius;
                 const baseY = Configuration.platform.base.height;
                 const baseZ = normalZ * Configuration.platform.base.radius;
@@ -21,6 +21,11 @@ class Platform extends Renderable {
                 const roofX = normalX * Configuration.platform.roof.radius;
                 const roofY = poleY + Configuration.platform.roof.height;
                 const roofZ = normalZ * Configuration.platform.roof.radius;
+                const roofAngle = Math.atan(Configuration.platform.roof.height / Configuration.platform.roof.radius);
+                const roofNormalXZ = Math.sin(roofAngle);
+                const roofNormalX = normalX * roofNormalXZ;
+                const roofNormalY = Math.cos(roofAngle);
+                const roofNormalZ = normalZ * roofNormalXZ;
                 const next = (i + 1) % Configuration.platform.sectors;
                 // base bottom
                 positions.push(baseX, 0.0, baseZ);
@@ -66,8 +71,8 @@ class Platform extends Renderable {
                 // roof top
                 positions.push(roofX, poleY, roofZ);
                 positions.push(0.0, roofY, 0.0);
-                normals.push(0.0, 1.0, 0.0); // TODO
-                normals.push(0.0, 1.0, 0.0); // TODO
+                normals.push(roofNormalX, roofNormalY, roofNormalY);
+                normals.push(roofNormalX, roofNormalY, roofNormalY);
                 colors.push(...Configuration.platform.roof.top);
                 colors.push(...Configuration.platform.roof.top);
                 indices.push(i * n + 10, i * n + 11, next * n + 11);
