@@ -7,14 +7,50 @@ class Platform extends Renderable {
             const normals = [0.0, -1.0, 0.0];
             const colors = [1.0, 0.0, 0.0, 1.0];
             const indices = [];
+            const n = 7;
             for (let i = 0; i < Configuration.platform.sectors; i++) {
-                const a = i * 2 * Math.PI / Configuration.platform.sectors;
-                const x = Math.cos(a);
-                const z = Math.sin(a);
-                positions.push(x * Configuration.platform.base.radius, 0.0, z * Configuration.platform.base.radius);
+                const angle = i * 2 * Math.PI / Configuration.platform.sectors;
+                const normalX = Math.cos(angle);
+                const normalZ = Math.sin(angle);
+                const baseX = normalX * Configuration.platform.base.radius;
+                const baseY = Configuration.platform.base.height;
+                const baseZ = normalZ * Configuration.platform.base.radius;
+                const poleX = normalX * Configuration.platform.pole.radius;
+                const poleY = baseY + Configuration.platform.pole.height;
+                const poleZ = normalZ * Configuration.platform.pole.radius;
+                const next = (i + 1) % Configuration.platform.sectors;
+                // base bottom
+                positions.push(baseX, 0.0, baseZ);
                 normals.push(0.0, -1.0, 0.0);
                 colors.push(1.0, 0.0, 0.0, 1.0);
-                indices.push(i + 1, (i + 1) % Configuration.platform.sectors + 1, 0);
+                indices.push(i * n + 1, next * n + 1, 0);
+                // base side
+                positions.push(baseX, 0.0, baseZ);
+                positions.push(baseX, baseY, baseZ);
+                normals.push(normalX, 0.0, normalZ);
+                normals.push(normalX, 0.0, normalZ);
+                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(1.0, 0.0, 0.0, 1.0);
+                indices.push(i * n + 2, i * n + 3, next * n + 3);
+                indices.push(next * n + 3, next * n + 2, i * n + 2);
+                // base top
+                positions.push(baseX, baseY, baseZ);
+                positions.push(poleX, baseY, poleZ);
+                normals.push(0.0, 1.0, 0.0);
+                normals.push(0.0, 1.0, 0.0);
+                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(1.0, 0.0, 0.0, 1.0);
+                indices.push(i * n + 4, i * n + 5, next * n + 5);
+                indices.push(next * n + 5, next * n + 4, i * n + 4);
+                // pole
+                positions.push(poleX, baseY, poleZ);
+                positions.push(poleX, poleY, poleZ);
+                normals.push(normalX, 0.0, normalZ);
+                normals.push(normalX, 0.0, normalZ);
+                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(1.0, 0.0, 0.0, 1.0);
+                indices.push(i * n + 6, i * n + 7, next * n + 7);
+                indices.push(next * n + 7, next * n + 6, i * n + 6);
             }
             return {positions, normals, colors, indices};
         })());

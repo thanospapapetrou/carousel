@@ -20,11 +20,11 @@ const Configuration = Object.freeze({
     },
     distance: {
         min: 0.1, // 0.1 m
-        max: 50, // 50 m
-        velocity: 25.0 // 25 m/s
+        max: 10, // 10 m
+        velocity: 5.0 // 5 m/s
     },
     rotation: {
-        velocity: 1.57079632679 // π/2 rad/s
+        velocity: 0.157079632679 // π/20 rad/s
     },
     light: {
         ambient: {
@@ -36,9 +36,14 @@ const Configuration = Object.freeze({
         }
     },
     platform: {
-        sectors: 16,
+        sectors: 64,
         base: {
-            radius: 10.0
+            radius: 2.0, // 2 m
+            height: 0.2 // 0.2 m
+        },
+        pole: {
+            radius: 0.5, // 0.5 m
+            height: 2.0 // 2 m
         }
     }
 });
