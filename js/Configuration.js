@@ -20,7 +20,7 @@ const Configuration = Object.freeze({
     },
     distance: {
         min: 0.1, // 0.1 m
-        max: 100, // 100 m
+        max: 50, // 50 m
         velocity: 25.0 // 25 m/s
     },
     rotation: {
@@ -33,6 +33,12 @@ const Configuration = Object.freeze({
         directional: {
             color: [0.75, 0.75, 0.75], // 75% white
             direction: [-1.0, -1.0, -1.0]
+        }
+    },
+    platform: {
+        sectors: 16,
+        base: {
+            radius: 10.0
         }
     }
 });
