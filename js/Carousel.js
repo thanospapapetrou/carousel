@@ -25,6 +25,7 @@ class Carousel {
     #renderer;
     #platform;
     #pole;
+    #horse;
     #azimuth;
     #elevation;
     #distance;
@@ -64,6 +65,7 @@ class Carousel {
         this.#renderer = renderer;
         this.#platform = platform;
         this.#pole = pole;
+        this.#horse = new HorseBody(this.#gl, this.#renderer.attributes);
         this.azimuth = 0.0;
         this.elevation = 0.0;
         this.distance = Configuration.distance.max;
@@ -94,7 +96,8 @@ class Carousel {
         } else if (this.#azimuth >= 2 * Math.PI) {
             this.#azimuth -= 2 * Math.PI;
         }
-        document.querySelector(Carousel.#SELECTOR_AZIMUTH).firstChild.nodeValue = Carousel.#FORMAT_ANGLE(this.#azimuth);
+        document.querySelector(Carousel.#SELECTOR_AZIMUTH).firstChild.nodeValue =
+                Carousel.#FORMAT_ANGLE(this.#azimuth);
     }
 
     get elevation() {
@@ -103,7 +106,8 @@ class Carousel {
 
     set elevation(elevation) {
         this.#elevation = Math.min(Math.max(elevation, -Math.PI / 2), Math.PI / 2);
-        document.querySelector(Carousel.#SELECTOR_ELEVATION).firstChild.nodeValue = Carousel.#FORMAT_ANGLE(this.#elevation);
+        document.querySelector(Carousel.#SELECTOR_ELEVATION).firstChild.nodeValue =
+                Carousel.#FORMAT_ANGLE(this.#elevation);
     }
 
     get distance() {
@@ -112,7 +116,8 @@ class Carousel {
 
     set distance(distance) {
         this.#distance = Math.min(Math.max(distance, Configuration.distance.min), Configuration.distance.max);
-        document.querySelector(Carousel.#SELECTOR_DISTANCE).firstChild.nodeValue = Carousel.#FORMAT_DISTANCE(this.#distance);
+        document.querySelector(Carousel.#SELECTOR_DISTANCE).firstChild.nodeValue =
+                Carousel.#FORMAT_DISTANCE(this.#distance);
     }
 
     set fps(fps) {
@@ -165,15 +170,20 @@ class Carousel {
         this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_PROJECTION], false, this.#projection);
         this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_CAMERA], false, this.#camera);
         this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false, this.#model);
-        this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_AMBIENT], Configuration.light.ambient.color);
+        this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_AMBIENT],
+            Configuration.light.ambient.color);
         this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_DIRECTIONAL_COLOR],
                 Configuration.light.directional.color);
         this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_DIRECTIONAL_DIRECTION],
                 Configuration.light.directional.direction);
         this.#platform.render();
         for (let i = 0; i < Configuration.platform.poles; i++) {
-            this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false, this.#poleModel(i));
+            this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false,
+                    this.#poleModel(this.#model, i));
             this.#pole.render();
+            this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false,
+                    this.#horseModel(this.#model, i));
+            this.#horse.render();
         }
         requestAnimationFrame(this.render.bind(this));
     }
@@ -210,13 +220,23 @@ class Carousel {
         return model;
     }
 
-    #poleModel(i) {
+    #poleModel(parent, i) {
         const angle = i * 2 * Math.PI / Configuration.platform.poles;
-        const radius = (Configuration.platform.base.radius + Configuration.platform.pole.radius) / 2;
         const model = mat4.create();
-        mat4.rotateY(model, model, this.rotation);
-        mat4.translate(model, model, [Math.cos(angle) * radius, Configuration.platform.base.height,
-                Math.sin(angle) * radius]);
+        mat4.multiply(model, model, parent);
+        mat4.translate(model, model, [Math.cos(angle) * Configuration.poles.distance,
+                Configuration.platform.base.height, Math.sin(angle) * Configuration.poles.distance]);
+        return model;
+    }
+
+    #horseModel(parent, i) {
+        const angle = i * 2 * Math.PI / Configuration.platform.poles;
+        const model = mat4.create();
+        mat4.multiply(model, model, parent);
+        mat4.rotateY(model, model, angle);
+        mat4.translate(model, model, [Configuration.poles.distance,
+            1.0 + Math.sin(this.#rotation + Configuration.horse.frequency * angle), 0.0]); // TODO
+        mat4.rotateY(model, model, Math.PI);
         return model;
     }
 }

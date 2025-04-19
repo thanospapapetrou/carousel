@@ -3,6 +3,7 @@
 class Platform extends Renderable {
     constructor(gl, attributes) {
         super(gl, attributes, (() => {
+            // base center
             const positions = [0.0, 0.0, 0.0];
             const normals = [0.0, -1.0, 0.0];
             const colors = [...Configuration.platform.base.color];

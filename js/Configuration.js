@@ -56,8 +56,18 @@ const Configuration = Object.freeze({
         }
     },
     poles: {
+        distance: 1.75, // 1.75 m
         radius: 0.05, // 0.05 m
         sectors: 8,
         color: [0.0, 1.0, 0.0, 1.0] // green
+    },
+    horse: {
+        frequency: 2.0, // 2 Hz
+        color: [1.0, 1.0, 1.0, 1.0], // white
+        body: {
+            length: 1, // 1 m
+            radius: 0.25, // 0.25 m
+            sectors: 16
+        }
     }
 });
