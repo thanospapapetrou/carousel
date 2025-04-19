@@ -7,13 +7,6 @@ class Carousel {
     static #FORMAT_ANGLE = (angle) => `${angle} rad (${angle * 180 / Math.PI} °)`;
     static #FORMAT_DISTANCE = (distance) => `${distance} m`;
     static #MS_PER_S = 1000;
-    static #LIGHT = {
-        ambient: [0.25, 0.25, 0.25],
-        directional: {
-            color: [0.75, 0.25, 0.25],
-            direction: [0.0, 1.0, 0.0]
-        }
-    };
     static #SELECTOR_AZIMUTH = 'span#azimuth';
     static #SELECTOR_CANVAS = 'canvas#carousel';
     static #SELECTOR_DISTANCE = 'span#distance';
@@ -190,16 +183,16 @@ class Carousel {
         if (event.type == Event.KEY_DOWN) {
             switch (event.code) {
             case KeyCode.ARROW_UP:
-                this.#velocityElevation = Configuration.elevation;
+                this.#velocityElevation = Configuration.elevation.velocity;
                 break;
             case KeyCode.ARROW_DOWN:
-                this.#velocityElevation = -Configuration.elevation;
+                this.#velocityElevation = -Configuration.elevation.velocity;
                 break;
             case KeyCode.ARROW_LEFT:
-                this.#velocityAzimuth = Configuration.azimuth;
+                this.#velocityAzimuth = Configuration.azimuth.velocity;
                 break;
             case KeyCode.ARROW_RIGHT:
-                this.#velocityAzimuth = -Configuration.azimuth;
+                this.#velocityAzimuth = -Configuration.azimuth.velocity;
                 break;
             case KeyCode.PAGE_UP:
                 this.#velocityDistance = Configuration.distance.velocity;
@@ -217,11 +210,11 @@ class Carousel {
         this.#gl.useProgram(this.#renderer.program);
         this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_PROJECTION], false, this.#projection);
         this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_CAMERA], false, this.#camera);
-        this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_AMBIENT], Carousel.#LIGHT.ambient);
+        this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_AMBIENT], Configuration.light.ambient.color);
         this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_DIRECTIONAL_COLOR],
-                Carousel.#LIGHT.directional.color);
+                Configuration.light.directional.color);
         this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_DIRECTIONAL_DIRECTION],
-                Carousel.#LIGHT.directional.direction);
+                Configuration.light.directional.direction);
         const n = 3;
         const m = 4;
         const l = 5;
@@ -242,7 +235,7 @@ class Carousel {
         this.azimuth += this.#velocityAzimuth * dt;
         this.elevation += this.#velocityElevation * dt;
         this.distance += this.#velocityDistance * dt;
-        this.rotation += Configuration.rotation * dt;
+        this.rotation += Configuration.rotation.velocity * dt;
         this.#time = time;
     }
 

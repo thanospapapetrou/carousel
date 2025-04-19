@@ -12,12 +12,27 @@ const Configuration = Object.freeze({
             far: 100.0 // 100 m
         }
     },
-    azimuth: 1.57079632679, // π/2 rad/s
-    elevation: 1.57079632679, // π/2 rad/s
+    azimuth: {
+        velocity: 1.57079632679, // π/2 rad/s
+    },
+    elevation: {
+        velocity: 1.57079632679, // π/2 rad/s
+    },
     distance: {
         min: 0.1, // 0.1 m
         max: 100, // 100 m
         velocity: 25.0 // 25 m/s
     },
-    rotation: 1.57079632679 // π/2 rad/s
+    rotation: {
+        velocity: 1.57079632679 // π/2 rad/s
+    },
+    light: {
+        ambient: {
+            color: [0.25, 0.25, 0.25] // 25% white
+        },
+        directional: {
+            color: [0.75, 0.75, 0.75], // 75% white
+            direction: [-1.0, -1.0, -1.0]
+        }
+    }
 });
