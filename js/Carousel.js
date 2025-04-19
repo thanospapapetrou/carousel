@@ -66,6 +66,7 @@ class Carousel {
         this.#platform = platform;
         this.#pole = pole;
         this.#horse = new HorseBody(this.#gl, this.#renderer.attributes);
+        this.#horse.neck = new HorseNeck(this.#gl, this.#renderer.attributes); // TODO
         this.azimuth = 0.0;
         this.elevation = 0.0;
         this.distance = Configuration.distance.max;
@@ -184,6 +185,7 @@ class Carousel {
             this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false,
                     this.#horseModel(this.#model, i));
             this.#horse.render();
+            this.#horse.neck.render();
         }
         requestAnimationFrame(this.render.bind(this));
     }

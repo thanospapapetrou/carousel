@@ -39,18 +39,18 @@ const Configuration = Object.freeze({
         poles: 8,
         sectors: 64,
         base: {
-            radius: 2.0, // 2 m
             height: 0.2, // 0.2 m,
+            radius: 2.0, // 2 m
             color: [0.0, 0.0, 1.0, 1.0] // blue
         },
         pole: {
-            radius: 0.5, // 0.5 m
             height: 2.0, // 2 m
+            radius: 0.5, // 0.5 m
             color: [1.0, 0.0, 0.0, 1.0] // red
         },
         roof: {
-            radius: 2.0, // 2 m
             height: 1.0, // 1 m
+            radius: 2.0, // 2 m
             bottom: [1.0, 0.0, 1.0, 1.0], // purple
             top: [1.0, 1.0, 0.0, 1.0] // yellow
         }
@@ -68,6 +68,11 @@ const Configuration = Object.freeze({
             length: 1, // 1 m
             radius: 0.25, // 0.25 m
             sectors: 16
+        },
+        neck: {
+            height: 0.5, // 0.5 m
+            radius: 0.125, // 0.125 m
+            sectors: 8
         }
     }
 });
