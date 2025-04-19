@@ -7,7 +7,7 @@ class Platform extends Renderable {
             const normals = [0.0, -1.0, 0.0];
             const colors = [1.0, 0.0, 0.0, 1.0];
             const indices = [];
-            const n = 7;
+            const n = 11;
             for (let i = 0; i < Configuration.platform.sectors; i++) {
                 const angle = i * 2 * Math.PI / Configuration.platform.sectors;
                 const normalX = Math.cos(angle);
@@ -18,6 +18,9 @@ class Platform extends Renderable {
                 const poleX = normalX * Configuration.platform.pole.radius;
                 const poleY = baseY + Configuration.platform.pole.height;
                 const poleZ = normalZ * Configuration.platform.pole.radius;
+                const roofX = normalX * Configuration.platform.roof.radius;
+                const roofY = poleY + Configuration.platform.roof.height;
+                const roofZ = normalZ * Configuration.platform.roof.radius;
                 const next = (i + 1) % Configuration.platform.sectors;
                 // base bottom
                 positions.push(baseX, 0.0, baseZ);
@@ -51,6 +54,24 @@ class Platform extends Renderable {
                 colors.push(1.0, 0.0, 0.0, 1.0);
                 indices.push(i * n + 6, i * n + 7, next * n + 7);
                 indices.push(next * n + 7, next * n + 6, i * n + 6);
+                // roof bottom
+                positions.push(poleX, poleY, poleZ);
+                positions.push(roofX, poleY, roofZ);
+                normals.push(0.0, -1.0, 0.0);
+                normals.push(0.0, -1.0, 0.0);
+                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(1.0, 0.0, 0.0, 1.0);
+                indices.push(i * n + 8, i * n + 9, next * n + 9);
+                indices.push(next * n + 9, next * n + 8, i * n + 8);
+                // roof top
+                positions.push(roofX, poleY, roofZ);
+                positions.push(0.0, roofY, 0.0);
+                normals.push(0.0, 1.0, 0.0); // TODO
+                normals.push(0.0, 1.0, 0.0); // TODO
+                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(1.0, 0.0, 0.0, 1.0);
+                indices.push(i * n + 10, i * n + 11, next * n + 11);
+                indices.push(next * n + 11, next * n + 10, i * n + 10);
             }
             return {positions, normals, colors, indices};
         })());

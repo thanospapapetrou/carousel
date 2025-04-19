@@ -44,6 +44,10 @@ const Configuration = Object.freeze({
         pole: {
             radius: 0.5, // 0.5 m
             height: 2.0 // 2 m
+        },
+        roof: {
+            radius: 2.0, // 2 m
+            height: 1.0 // 1 m
         }
     }
 });
