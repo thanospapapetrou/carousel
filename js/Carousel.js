@@ -24,6 +24,7 @@ class Carousel {
     #gl;
     #renderer;
     #platform;
+    #pole;
     #azimuth;
     #elevation;
     #distance;
@@ -41,7 +42,9 @@ class Carousel {
                         Carousel.#UNIFORM_CAMERA, Carousel.#UNIFORM_MODEL, Carousel.#UNIFORM_LIGHT_AMBIENT,
                         Carousel.#UNIFORM_LIGHT_DIRECTIONAL_COLOR, Carousel.#UNIFORM_LIGHT_DIRECTIONAL_DIRECTION],
                         Carousel.#ATTRIBUTES);
-                const carousel = new Carousel(gl, renderer, new Platform(gl, renderer.attributes));
+                const platform = new Platform(gl, renderer.attributes);
+                const pole = new Pole(gl, renderer.attributes);
+                const carousel = new Carousel(gl, renderer, platform, pole);
                 requestAnimationFrame(carousel.render.bind(carousel));
             })
         });
@@ -56,10 +59,11 @@ class Carousel {
         });
     }
 
-    constructor(gl, renderer, platform) {
+    constructor(gl, renderer, platform, pole) {
         this.#gl = gl;
         this.#renderer = renderer;
         this.#platform = platform;
+        this.#pole = pole;
         this.azimuth = 0.0;
         this.elevation = 0.0;
         this.distance = Configuration.distance.max;
@@ -167,6 +171,10 @@ class Carousel {
         this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_DIRECTIONAL_DIRECTION],
                 Configuration.light.directional.direction);
         this.#platform.render();
+        for (let i = 0; i < Configuration.platform.poles; i++) {
+            this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false, this.#poleModel(i));
+            this.#pole.render();
+        }
         requestAnimationFrame(this.render.bind(this));
     }
 
@@ -199,6 +207,16 @@ class Carousel {
     get #model() {
         const model = mat4.create();
         mat4.rotateY(model, model, this.rotation);
+        return model;
+    }
+
+    #poleModel(i) {
+        const angle = i * 2 * Math.PI / Configuration.platform.poles;
+        const radius = (Configuration.platform.base.radius + Configuration.platform.pole.radius) / 2;
+        const model = mat4.create();
+        mat4.rotateY(model, model, this.rotation);
+        mat4.translate(model, model, [Math.cos(angle) * radius, Configuration.platform.base.height,
+                Math.sin(angle) * radius]);
         return model;
     }
 }

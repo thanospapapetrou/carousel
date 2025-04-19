@@ -55,8 +55,8 @@ class Platform extends Renderable {
                 positions.push(poleX, poleY, poleZ);
                 normals.push(normalX, 0.0, normalZ);
                 normals.push(normalX, 0.0, normalZ);
-                colors.push(1.0, 0.0, 0.0, 1.0);
-                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(...Configuration.platform.pole.color);
+                colors.push(...Configuration.platform.pole.color);
                 indices.push(i * n + 6, i * n + 7, next * n + 7);
                 indices.push(next * n + 7, next * n + 6, i * n + 6);
                 // roof bottom
