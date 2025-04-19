@@ -39,7 +39,8 @@ const Configuration = Object.freeze({
         sectors: 64,
         base: {
             radius: 2.0, // 2 m
-            height: 0.2 // 0.2 m
+            height: 0.2, // 0.2 m,
+            color: [0.0, 0.0, 1.0, 1.0] // blue
         },
         pole: {
             radius: 0.5, // 0.5 m
@@ -47,7 +48,9 @@ const Configuration = Object.freeze({
         },
         roof: {
             radius: 2.0, // 2 m
-            height: 1.0 // 1 m
+            height: 1.0, // 1 m
+            bottom: [1.0, 0.0, 1.0, 1.0], // purple
+            top: [1.0, 1.0, 0.0, 1.0] // yellow
         }
     }
 });

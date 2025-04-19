@@ -5,7 +5,7 @@ class Platform extends Renderable {
         super(gl, attributes, (() => {
             const positions = [0.0, 0.0, 0.0];
             const normals = [0.0, -1.0, 0.0];
-            const colors = [1.0, 0.0, 0.0, 1.0];
+            const colors = [...Configuration.platform.base.color];
             const indices = [];
             const n = 11;
             for (let i = 0; i < Configuration.platform.sectors; i++) {
@@ -25,15 +25,15 @@ class Platform extends Renderable {
                 // base bottom
                 positions.push(baseX, 0.0, baseZ);
                 normals.push(0.0, -1.0, 0.0);
-                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(...Configuration.platform.base.color);
                 indices.push(i * n + 1, next * n + 1, 0);
                 // base side
                 positions.push(baseX, 0.0, baseZ);
                 positions.push(baseX, baseY, baseZ);
                 normals.push(normalX, 0.0, normalZ);
                 normals.push(normalX, 0.0, normalZ);
-                colors.push(1.0, 0.0, 0.0, 1.0);
-                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(...Configuration.platform.base.color);
+                colors.push(...Configuration.platform.base.color);
                 indices.push(i * n + 2, i * n + 3, next * n + 3);
                 indices.push(next * n + 3, next * n + 2, i * n + 2);
                 // base top
@@ -41,8 +41,8 @@ class Platform extends Renderable {
                 positions.push(poleX, baseY, poleZ);
                 normals.push(0.0, 1.0, 0.0);
                 normals.push(0.0, 1.0, 0.0);
-                colors.push(1.0, 0.0, 0.0, 1.0);
-                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(...Configuration.platform.base.color);
+                colors.push(...Configuration.platform.base.color);
                 indices.push(i * n + 4, i * n + 5, next * n + 5);
                 indices.push(next * n + 5, next * n + 4, i * n + 4);
                 // pole
@@ -59,8 +59,8 @@ class Platform extends Renderable {
                 positions.push(roofX, poleY, roofZ);
                 normals.push(0.0, -1.0, 0.0);
                 normals.push(0.0, -1.0, 0.0);
-                colors.push(1.0, 0.0, 0.0, 1.0);
-                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(...Configuration.platform.roof.bottom);
+                colors.push(...Configuration.platform.roof.bottom);
                 indices.push(i * n + 8, i * n + 9, next * n + 9);
                 indices.push(next * n + 9, next * n + 8, i * n + 8);
                 // roof top
@@ -68,8 +68,8 @@ class Platform extends Renderable {
                 positions.push(0.0, roofY, 0.0);
                 normals.push(0.0, 1.0, 0.0); // TODO
                 normals.push(0.0, 1.0, 0.0); // TODO
-                colors.push(1.0, 0.0, 0.0, 1.0);
-                colors.push(1.0, 0.0, 0.0, 1.0);
+                colors.push(...Configuration.platform.roof.top);
+                colors.push(...Configuration.platform.roof.top);
                 indices.push(i * n + 10, i * n + 11, next * n + 11);
                 indices.push(next * n + 11, next * n + 10, i * n + 10);
             }
