@@ -3,7 +3,6 @@
 class Carousel {
     static #ATTRIBUTES = ['position', 'normal', 'color'];
     static #CONTEXT = 'webgl2';
-    static #ERROR_LOADING = (url, status) => `Error loading ${url}: HTTP status ${status}`;
     static #FORMAT_ANGLE = (angle) => `${angle} rad (${angle * 180 / Math.PI} °)`;
     static #FORMAT_DISTANCE = (distance) => `${distance} m`;
     static #MS_PER_S = 1000;
@@ -12,8 +11,6 @@ class Carousel {
     static #SELECTOR_DISTANCE = 'span#distance';
     static #SELECTOR_ELEVATION = 'span#elevation';
     static #SELECTOR_FPS = 'span#fps';
-    static #SHADER_FRAGMENT = './glsl/carousel.frag';
-    static #SHADER_VERTEX = './glsl/carousel.vert';
 
     #gl;
     #renderer;
@@ -29,49 +26,39 @@ class Carousel {
     #rotation;
     #time;
 
-    static main() {
-        Carousel.#load(Carousel.#SHADER_VERTEX).then((response) => response.text()).then((vertex) => {
-            Carousel.#load(Carousel.#SHADER_FRAGMENT).then((response) => response.text()).then((fragment) => {
-                const gl = document.querySelector(Carousel.#SELECTOR_CANVAS).getContext(Carousel.#CONTEXT);
-                const carousel = new Carousel(gl, vertex, fragment);
-                requestAnimationFrame(carousel.render.bind(carousel));
-            })
-        });
+    static async main() {
+        const gl = document.querySelector(Carousel.#SELECTOR_CANVAS).getContext(Carousel.#CONTEXT);
+        const carousel = await new Carousel(gl);
+        requestAnimationFrame(carousel.render.bind(carousel));
     }
 
-    static #load(url) {
-        return fetch(url).then((response) => {
-            if (!response.ok) {
-                throw new Error(Carousel.#ERROR_LOADING(url, response.status));
-            }
-            return response;
-        });
-    }
-
-    constructor(gl, vertex, fragment) {
+    constructor(gl) {
         this.#gl = gl;
-        this.#renderer = new CarouselRenderer(this.#gl, vertex, fragment, Carousel.#ATTRIBUTES);
-        this.#platform = new Platform(this.#gl, this.#renderer.attributes);
-        this.#pole = new Pole(this.#gl, this.#renderer.attributes);
-        this.#horse = new HorseBody(this.#gl, this.#renderer.attributes);
-        this.#horse.neck = new HorseNeck(this.#gl, this.#renderer.attributes); // TODO
-        this.azimuth = 0.0;
-        this.elevation = 0.0;
-        this.distance = Configuration.distance.max;
-        this.#velocityAzimuth = 0.0;
-        this.#velocityElevation = 0.0;
-        this.#velocityDistance = 0.0;
-        this.#rotation = 0.0;
-        this.#time = 0;
-        this.#gl.clearColor(...Configuration.clear.color);
-        this.#gl.clearDepth(Configuration.clear.depth);
-        this.#gl.depthFunc(this.#gl.LEQUAL);
-        this.#gl.enable(this.#gl.DEPTH_TEST);
-        this.#gl.cullFace(this.#gl.BACK);
-        this.#gl.enable(this.#gl.CULL_FACE);
-        this.#gl.canvas.addEventListener(Event.KEY_DOWN, this.keyboard.bind(this));
-        this.#gl.canvas.addEventListener(Event.KEY_UP, this.keyboard.bind(this));
-        this.#gl.canvas.focus();
+        return (async () => {
+            this.#renderer = await new CarouselRenderer(this.#gl, Carousel.#ATTRIBUTES);
+            this.#platform = new Platform(this.#gl, this.#renderer.attributes);
+            this.#pole = new Pole(this.#gl, this.#renderer.attributes);
+            this.#horse = new HorseBody(this.#gl, this.#renderer.attributes);
+            this.#horse.neck = new HorseNeck(this.#gl, this.#renderer.attributes); // TODO
+            this.azimuth = 0.0;
+            this.elevation = 0.0;
+            this.distance = Configuration.distance.max;
+            this.#velocityAzimuth = 0.0;
+            this.#velocityElevation = 0.0;
+            this.#velocityDistance = 0.0;
+            this.#rotation = 0.0;
+            this.#time = 0;
+            this.#gl.clearColor(...Configuration.clear.color);
+            this.#gl.clearDepth(Configuration.clear.depth);
+            this.#gl.depthFunc(this.#gl.LEQUAL);
+            this.#gl.enable(this.#gl.DEPTH_TEST);
+            this.#gl.cullFace(this.#gl.BACK);
+            this.#gl.enable(this.#gl.CULL_FACE);
+            this.#gl.canvas.addEventListener(Event.KEY_DOWN, this.keyboard.bind(this));
+            this.#gl.canvas.addEventListener(Event.KEY_UP, this.keyboard.bind(this));
+            this.#gl.canvas.focus();
+            return this;
+        })();
     }
 
     get azimuth() {
