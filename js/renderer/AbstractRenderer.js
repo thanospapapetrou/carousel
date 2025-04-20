@@ -1,6 +1,6 @@
 'use strict';
 
-class Renderer {
+class AbstractRenderer {
     static #ERROR_COMPILING = (type, info) => `Error compiling ${(type == WebGLRenderingContext.VERTEX_SHADER) ? 'vertex' : 'fragment'} shader: ${info}`;
     static #ERROR_LINKING = (info) => `Error linking program: ${info}`;
 

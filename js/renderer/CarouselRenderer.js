@@ -1,6 +1,6 @@
 'use strict';
 
-class CarouselRenderer extends Renderer {
+class CarouselRenderer extends AbstractRenderer {
     static UNIFORM_CAMERA = 'camera';
     static UNIFORM_LIGHT_AMBIENT = 'light.ambient';
     static UNIFORM_LIGHT_DIRECTIONAL_COLOR = 'light.directional.color';
