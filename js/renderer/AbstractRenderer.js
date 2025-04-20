@@ -1,9 +1,11 @@
 'use strict';
 
 class AbstractRenderer {
+    static #DELIMITER = '.';
     static #ERROR_COMPILING = (type, info) => `Error compiling ${(type == WebGLRenderingContext.VERTEX_SHADER) ? 'vertex' : 'fragment'} shader: ${info}`;
     static #ERROR_LINKING = (info) => `Error linking program: ${info}`;
     static #ERROR_LOADING = (url, status) => `Error loading ${url}: HTTP status ${status}`;
+    static #TYPE_FUNCTION = 'function';
 
     #gl;
     #program;
@@ -13,8 +15,8 @@ class AbstractRenderer {
     constructor(gl, vertex, fragment, uniforms, attributes) {
         this.#gl = gl;
         return (async () => {
-            await this.#link(vertex, fragment);
-            this.#resolveUniforms(uniforms);
+            this.#program = await this.#link(vertex, fragment);
+            this.#uniforms = this.#resolveUniforms('', uniforms);
             this.#resolveAttributes(attributes);
             return this;
         })();
@@ -33,16 +35,16 @@ class AbstractRenderer {
     }
 
     async #link(vertex, fragment) {
-        this.#program = this.#gl.createProgram();
-        this.#gl.attachShader(this.#program, await this.#compile(vertex, this.#gl.VERTEX_SHADER));
-        this.#gl.attachShader(this.#program, await this.#compile(fragment, this.#gl.FRAGMENT_SHADER));
-        this.#gl.linkProgram(this.#program);
-        if (!this.#gl.getProgramParameter(this.#program, this.#gl.LINK_STATUS)) {
-            const info = this.#gl.getProgramInfoLog(this.#program);
-            this.#gl.deleteProgram(this.#program);
-            this.#program = null;
+        const program = this.#gl.createProgram();
+        this.#gl.attachShader(program, await this.#compile(vertex, this.#gl.VERTEX_SHADER));
+        this.#gl.attachShader(program, await this.#compile(fragment, this.#gl.FRAGMENT_SHADER));
+        this.#gl.linkProgram(program);
+        if (!this.#gl.getProgramParameter(program, this.#gl.LINK_STATUS)) {
+            const info = this.#gl.getProgramInfoLog(program);
+            this.#gl.deleteProgram(program);
             throw new Error(Renderer.#ERROR_LINKING(info));
         }
+        return program;
     }
 
     async #compile(url, type) {
@@ -65,11 +67,23 @@ class AbstractRenderer {
         return response.text();
     }
 
-    #resolveUniforms(uniforms) {
-        this.#uniforms = {};
-        for (let uniform of uniforms) {
-            this.#uniforms[uniform] = this.#gl.getUniformLocation(this.#program, uniform);
+    #resolveUniforms(prefix, uniforms) {
+        const result = {};
+        const gl = this.#gl;
+        for (let uniform of Object.keys(uniforms)) {
+            const setter = uniforms[uniform];
+            if (typeof setter == AbstractRenderer.#TYPE_FUNCTION) {
+                const location = this.#gl.getUniformLocation(this.#program, prefix + uniform);
+                Object.defineProperty(result, uniform, {
+                    set(value) {
+                        setter(gl, location, value);
+                    }
+                });
+            } else {
+                result[uniform] = this.#resolveUniforms(prefix + uniform + AbstractRenderer.#DELIMITER, setter);
+            }
         }
+        return result;
     }
 
     #resolveAttributes(attributes) {

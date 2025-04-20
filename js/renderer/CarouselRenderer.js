@@ -1,20 +1,21 @@
 'use strict';
 
 class CarouselRenderer extends AbstractRenderer {
-    static UNIFORM_CAMERA = 'camera';
-    static UNIFORM_LIGHT_AMBIENT = 'light.ambient';
-    static UNIFORM_LIGHT_DIRECTIONAL_COLOR = 'light.directional.color';
-    static UNIFORM_LIGHT_DIRECTIONAL_DIRECTION = 'light.directional.direction';
-    static UNIFORM_MODEL = 'model';
-    static UNIFORM_PROJECTION = 'projection';
-
     static #SHADER_FRAGMENT = './glsl/carousel.frag';
     static #SHADER_VERTEX = './glsl/carousel.vert';
 
     constructor(gl, attributes) {
-        super(gl, CarouselRenderer.#SHADER_VERTEX, CarouselRenderer.#SHADER_FRAGMENT,
-                [CarouselRenderer.UNIFORM_PROJECTION, CarouselRenderer.UNIFORM_CAMERA, CarouselRenderer.UNIFORM_MODEL,
-                CarouselRenderer.UNIFORM_LIGHT_AMBIENT, CarouselRenderer.UNIFORM_LIGHT_DIRECTIONAL_COLOR,
-                CarouselRenderer.UNIFORM_LIGHT_DIRECTIONAL_DIRECTION], attributes); // TODO hardcode attributes
+        super(gl, CarouselRenderer.#SHADER_VERTEX, CarouselRenderer.#SHADER_FRAGMENT, {
+            projection: (gl, uniform, projection) => gl.uniformMatrix4fv(uniform, false, projection),
+            camera: (gl, uniform, camera) => gl.uniformMatrix4fv(uniform, false, camera),
+            model: (gl, uniform, model) => gl.uniformMatrix4fv(uniform, false, model),
+            light: {
+                ambient: (gl, uniform, color) => gl.uniform3fv(uniform, color),
+                directional: {
+                    color: (gl, uniform, color) => gl.uniform3fv(uniform, color),
+                    direction: (gl, uniform, direction) => gl.uniform3fv(uniform, direction)
+                }
+            }
+        }, attributes); // TODO hardcode attributes
     }
 }

@@ -142,23 +142,17 @@ class Carousel {
         this.idle(time);
         this.#gl.clear(this.#gl.COLOR_BUFFER_BIT | this.#gl.DEPTH_BUFFER_BIT);
         this.#gl.useProgram(this.#renderer.program);
-        this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_PROJECTION], false,
-                this.#projection);
-        this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_CAMERA], false, this.#camera);
-        this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_MODEL], false, this.#model);
-        this.#gl.uniform3fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_LIGHT_AMBIENT],
-            Configuration.light.ambient.color);
-        this.#gl.uniform3fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_LIGHT_DIRECTIONAL_COLOR],
-                Configuration.light.directional.color);
-        this.#gl.uniform3fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_LIGHT_DIRECTIONAL_DIRECTION],
-                Configuration.light.directional.direction);
+        this.#renderer.uniforms.projection = this.#projection;
+        this.#renderer.uniforms.camera = this.#camera;
+        this.#renderer.uniforms.model = this.#model;
+        this.#renderer.uniforms.light.ambient = Configuration.light.ambient.color;
+        this.#renderer.uniforms.light.directional.color = Configuration.light.directional.color;
+        this.#renderer.uniforms.light.directional.direction = Configuration.light.directional.direction;
         this.#platform.render();
         for (let i = 0; i < Configuration.platform.poles; i++) {
-            this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_MODEL], false,
-                    this.#poleModel(this.#model, i));
+            this.#renderer.uniforms.model = this.#poleModel(this.#model, i);
             this.#pole.render();
-            this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_MODEL], false,
-            this.#horseModel(this.#model, i));
+            this.#renderer.uniforms.model = this.#horseModel(this.#model, i);
             this.#horse.render();
         }
         requestAnimationFrame(this.render.bind(this));
