@@ -1,6 +1,6 @@
 'use strict';
 
-class Renderable {
+class AbstractRenderable {
     #gl;
     #array;
     #count;

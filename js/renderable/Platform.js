@@ -1,6 +1,6 @@
 'use strict';
 
-class Platform extends Renderable {
+class Platform extends AbstractRenderable {
     constructor(gl, attributes) {
         super(gl, attributes, (() => {
             // base center

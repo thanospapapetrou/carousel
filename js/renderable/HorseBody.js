@@ -1,6 +1,6 @@
 'use strict';
 
-class HorseBody extends Renderable {
+class HorseBody extends AbstractRenderable {
     constructor(gl, attributes) {
         super(gl, attributes, (() => {
             // back center
