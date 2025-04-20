@@ -14,12 +14,6 @@ class Carousel {
     static #SELECTOR_FPS = 'span#fps';
     static #SHADER_FRAGMENT = './glsl/carousel.frag';
     static #SHADER_VERTEX = './glsl/carousel.vert';
-    static #UNIFORM_CAMERA = 'camera';
-    static #UNIFORM_LIGHT_AMBIENT = 'light.ambient';
-    static #UNIFORM_LIGHT_DIRECTIONAL_COLOR = 'light.directional.color';
-    static #UNIFORM_LIGHT_DIRECTIONAL_DIRECTION = 'light.directional.direction';
-    static #UNIFORM_MODEL = 'model';
-    static #UNIFORM_PROJECTION = 'projection';
 
     #gl;
     #renderer;
@@ -39,13 +33,7 @@ class Carousel {
         Carousel.#load(Carousel.#SHADER_VERTEX).then((response) => response.text()).then((vertex) => {
             Carousel.#load(Carousel.#SHADER_FRAGMENT).then((response) => response.text()).then((fragment) => {
                 const gl = document.querySelector(Carousel.#SELECTOR_CANVAS).getContext(Carousel.#CONTEXT);
-                const renderer = new Renderer(gl, vertex, fragment, [Carousel.#UNIFORM_PROJECTION,
-                        Carousel.#UNIFORM_CAMERA, Carousel.#UNIFORM_MODEL, Carousel.#UNIFORM_LIGHT_AMBIENT,
-                        Carousel.#UNIFORM_LIGHT_DIRECTIONAL_COLOR, Carousel.#UNIFORM_LIGHT_DIRECTIONAL_DIRECTION],
-                        Carousel.#ATTRIBUTES);
-                const platform = new Platform(gl, renderer.attributes);
-                const pole = new Pole(gl, renderer.attributes);
-                const carousel = new Carousel(gl, renderer, platform, pole);
+                const carousel = new Carousel(gl, vertex, fragment);
                 requestAnimationFrame(carousel.render.bind(carousel));
             })
         });
@@ -60,11 +48,11 @@ class Carousel {
         });
     }
 
-    constructor(gl, renderer, platform, pole) {
+    constructor(gl, vertex, fragment) {
         this.#gl = gl;
-        this.#renderer = renderer;
-        this.#platform = platform;
-        this.#pole = pole;
+        this.#renderer = new CarouselRenderer(this.#gl, vertex, fragment, Carousel.#ATTRIBUTES);
+        this.#platform = new Platform(this.#gl, this.#renderer.attributes);
+        this.#pole = new Pole(this.#gl, this.#renderer.attributes);
         this.#horse = new HorseBody(this.#gl, this.#renderer.attributes);
         this.#horse.neck = new HorseNeck(this.#gl, this.#renderer.attributes); // TODO
         this.azimuth = 0.0;
@@ -168,21 +156,22 @@ class Carousel {
         this.idle(time);
         this.#gl.clear(this.#gl.COLOR_BUFFER_BIT | this.#gl.DEPTH_BUFFER_BIT);
         this.#gl.useProgram(this.#renderer.program);
-        this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_PROJECTION], false, this.#projection);
-        this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_CAMERA], false, this.#camera);
-        this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false, this.#model);
-        this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_AMBIENT],
+        this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_PROJECTION], false,
+                this.#projection);
+        this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_CAMERA], false, this.#camera);
+        this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_MODEL], false, this.#model);
+        this.#gl.uniform3fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_LIGHT_AMBIENT],
             Configuration.light.ambient.color);
-        this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_DIRECTIONAL_COLOR],
+        this.#gl.uniform3fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_LIGHT_DIRECTIONAL_COLOR],
                 Configuration.light.directional.color);
-        this.#gl.uniform3fv(this.#renderer.uniforms[Carousel.#UNIFORM_LIGHT_DIRECTIONAL_DIRECTION],
+        this.#gl.uniform3fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_LIGHT_DIRECTIONAL_DIRECTION],
                 Configuration.light.directional.direction);
         this.#platform.render();
         for (let i = 0; i < Configuration.platform.poles; i++) {
-            this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false,
+            this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_MODEL], false,
                     this.#poleModel(this.#model, i));
             this.#pole.render();
-            this.#gl.uniformMatrix4fv(this.#renderer.uniforms[Carousel.#UNIFORM_MODEL], false,
+            this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_MODEL], false,
                     this.#horseModel(this.#model, i));
             this.#horse.render();
             this.#horse.neck.render();
