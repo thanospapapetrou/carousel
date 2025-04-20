@@ -1,8 +1,8 @@
 'use strict';
 
 class Body extends AbstractRenderable {
-    constructor(gl, attributes) {
-        super(gl, attributes, (() => {
+    constructor(gl, renderer) {
+        super(gl, renderer, (() => {
             // back center
             const positions = [0.0, 0.0, -Configuration.horse.body.length / 2];
             const normals = [0.0, 0.0, -1.0];
@@ -42,5 +42,10 @@ class Body extends AbstractRenderable {
             colors.push(...Configuration.horse.color);
             return {positions, normals, colors, indices};
         })());
+    }
+
+    render(parent) {
+        this._renderer.uniforms.model = parent;
+        super.render();
     }
 }

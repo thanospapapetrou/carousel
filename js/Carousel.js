@@ -26,8 +26,10 @@ class Carousel {
     #rotation;
     #time;
 
-    // TODO validate errors with urls
     // TODO load models from json
+    // TODO alpha
+    // TODO textures
+    // TODO other lights and shadows
 
     static async main() {
         const gl = document.querySelector(Carousel.#SELECTOR_CANVAS).getContext(Carousel.#CONTEXT);
@@ -39,9 +41,9 @@ class Carousel {
         this.#gl = gl;
         return (async () => {
             this.#renderer = await new CarouselRenderer(this.#gl, Carousel.#ATTRIBUTES);
-            this.#platform = new Platform(this.#gl, this.#renderer.attributes);
-            this.#pole = new Pole(this.#gl, this.#renderer.attributes);
-            this.#horse = new Horse(this.#gl, this.#renderer.attributes);
+            this.#platform = new Platform(this.#gl, this.#renderer);
+            this.#pole = new Pole(this.#gl, this.#renderer);
+            this.#horse = new Horse(this.#gl, this.#renderer);
             this.azimuth = 0.0;
             this.elevation = 0.0;
             this.distance = Configuration.distance.max;
@@ -155,8 +157,7 @@ class Carousel {
         for (let i = 0; i < Configuration.platform.poles; i++) {
             this.#renderer.uniforms.model = this.#poleModel(this.#model, i);
             this.#pole.render();
-            this.#renderer.uniforms.model = this.#horseModel(this.#model, i);
-            this.#horse.render();
+            this.#horse.render(this.#model, i, this.#rotation); // TODO this should be included in parent
         }
         requestAnimationFrame(this.render.bind(this));
     }
@@ -199,17 +200,6 @@ class Carousel {
         mat4.multiply(model, model, parent);
         mat4.translate(model, model, [Math.cos(angle) * Configuration.poles.distance,
                 Configuration.platform.base.height, Math.sin(angle) * Configuration.poles.distance]);
-        return model;
-    }
-
-    #horseModel(parent, i) {
-        const angle = i * 2 * Math.PI / Configuration.platform.poles;
-        const model = mat4.create();
-        mat4.multiply(model, model, parent);
-        mat4.rotateY(model, model, angle);
-        mat4.translate(model, model, [Configuration.poles.distance,
-            1.0 + Math.sin(this.#rotation + Configuration.horse.frequency * angle), 0.0]); // TODO
-        mat4.rotateY(model, model, Math.PI);
         return model;
     }
 }

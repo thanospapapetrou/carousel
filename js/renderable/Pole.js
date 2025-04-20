@@ -1,8 +1,8 @@
 'use strict';
 
 class Pole extends AbstractRenderable {
-    constructor(gl, attributes) {
-        super(gl, attributes, (() => {
+    constructor(gl, renderer) {
+        super(gl, renderer, (() => {
             const positions = [];
             const normals = [];
             const colors = [];

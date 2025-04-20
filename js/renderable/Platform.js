@@ -1,8 +1,8 @@
 'use strict';
 
 class Platform extends AbstractRenderable {
-    constructor(gl, attributes) {
-        super(gl, attributes, (() => {
+    constructor(gl, renderer) {
+        super(gl, renderer, (() => {
             // base center
             const positions = [0.0, 0.0, 0.0];
             const normals = [0.0, -1.0, 0.0];

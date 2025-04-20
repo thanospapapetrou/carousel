@@ -1,8 +1,8 @@
 'use strict';
 
 class Neck extends AbstractRenderable {
-    constructor(gl, attributes) {
-        super(gl, attributes, (() => {
+    constructor(gl, renderer) {
+        super(gl, renderer, (() => {
             const positions = [];
             const normals = [];
             const colors = [];
@@ -28,5 +28,17 @@ class Neck extends AbstractRenderable {
             }
             return {positions, normals, colors, indices};
         })());
+    }
+
+    render(parent) {
+        this._renderer.uniforms.model = this.#model(parent);
+        super.render();
+    }
+
+    #model(parent) {
+        const model = mat4.create();
+        mat4.multiply(model, model, parent);
+        mat4.translate(model, model, [0.0, 0.0, Configuration.horse.body.length / 2 - Configuration.horse.neck.radius]);
+        return model;
     }
 }
