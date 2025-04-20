@@ -1,6 +1,6 @@
 'use strict';
 
-class HorseNeck extends AbstractRenderable {
+class Neck extends AbstractRenderable {
     constructor(gl, attributes) {
         super(gl, attributes, (() => {
             const positions = [];

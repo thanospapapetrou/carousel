@@ -9,7 +9,7 @@ class AbstractRenderable {
         this.#gl = gl;
         this.#array = this.#gl.createVertexArray();
         this.#gl.bindVertexArray(this.#array);
-        // TODO cleanup
+        // TODO cleanup rendering and renderable
         const positions = this.#gl.createBuffer();
         this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, positions);
         this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(model.positions), this.#gl.STATIC_DRAW);

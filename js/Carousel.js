@@ -38,8 +38,7 @@ class Carousel {
             this.#renderer = await new CarouselRenderer(this.#gl, Carousel.#ATTRIBUTES);
             this.#platform = new Platform(this.#gl, this.#renderer.attributes);
             this.#pole = new Pole(this.#gl, this.#renderer.attributes);
-            this.#horse = new HorseBody(this.#gl, this.#renderer.attributes);
-            this.#horse.neck = new HorseNeck(this.#gl, this.#renderer.attributes); // TODO
+            this.#horse = new Horse(this.#gl, this.#renderer.attributes);
             this.azimuth = 0.0;
             this.elevation = 0.0;
             this.distance = Configuration.distance.max;
@@ -159,9 +158,8 @@ class Carousel {
                     this.#poleModel(this.#model, i));
             this.#pole.render();
             this.#gl.uniformMatrix4fv(this.#renderer.uniforms[CarouselRenderer.UNIFORM_MODEL], false,
-                    this.#horseModel(this.#model, i));
+            this.#horseModel(this.#model, i));
             this.#horse.render();
-            this.#horse.neck.render();
         }
         requestAnimationFrame(this.render.bind(this));
     }
