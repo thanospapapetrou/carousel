@@ -26,6 +26,9 @@ class Carousel {
     #rotation;
     #time;
 
+    // TODO validate errors with urls
+    // TODO load models from json
+
     static async main() {
         const gl = document.querySelector(Carousel.#SELECTOR_CANVAS).getContext(Carousel.#CONTEXT);
         const carousel = await new Carousel(gl);

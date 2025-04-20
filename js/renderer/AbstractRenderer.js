@@ -2,8 +2,8 @@
 
 class AbstractRenderer {
     static #DELIMITER = '.';
-    static #ERROR_COMPILING = (type, info) => `Error compiling ${(type == WebGLRenderingContext.VERTEX_SHADER) ? 'vertex' : 'fragment'} shader: ${info}`;
-    static #ERROR_LINKING = (info) => `Error linking program: ${info}`;
+    static #ERROR_COMPILING = (type, url, info) => `Error compiling ${(type == WebGLRenderingContext.VERTEX_SHADER) ? 'vertex' : 'fragment'} shader ${url}: ${info}`;
+    static #ERROR_LINKING = (vertex, fragment, info) => `Error linking program (${vertex}, ${fragment}): ${info}`;
     static #ERROR_LOADING = (url, status) => `Error loading ${url}: HTTP status ${status}`;
     static #TYPE_FUNCTION = 'function';
 
@@ -42,7 +42,7 @@ class AbstractRenderer {
         if (!this.#gl.getProgramParameter(program, this.#gl.LINK_STATUS)) {
             const info = this.#gl.getProgramInfoLog(program);
             this.#gl.deleteProgram(program);
-            throw new Error(Renderer.#ERROR_LINKING(info));
+            throw new Error(AbstractRenderer.#ERROR_LINKING(vertex, fragment, info));
         }
         return program;
     }
@@ -54,7 +54,7 @@ class AbstractRenderer {
         if (!this.#gl.getShaderParameter(shader, this.#gl.COMPILE_STATUS)) {
             const info = this.#gl.getShaderInfoLog(shader);
             this.#gl.deleteShader(shader);
-            throw new Error(Renderer.#ERROR_COMPILING(type, info))
+            throw new Error(AbstractRenderer.#ERROR_COMPILING(type, url, info))
         }
         return shader;
     }
