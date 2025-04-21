@@ -153,12 +153,13 @@ class Carousel {
         this.#renderer.uniforms.light.ambient = Configuration.light.ambient.color;
         this.#renderer.uniforms.light.directional.color = Configuration.light.directional.color;
         this.#renderer.uniforms.light.directional.direction = Configuration.light.directional.direction;
-        this.#platform.render();
-        for (let i = 0; i < Configuration.platform.poles; i++) {
-            const angle = i * 2 * Math.PI / Configuration.platform.poles;
-            this.#pole.render(this.#model, angle);
-            this.#horse.render(this.#model, angle, (this.#rotation + angle) * Configuration.horse.frequency);
-        }
+        new Sausage(this.#gl, this.#renderer, 1.0, 0.5, 8, 3, Configuration.horse.color).render();
+//        this.#platform.render();
+//        for (let i = 0; i < Configuration.platform.poles; i++) {
+//            const angle = i * 2 * Math.PI / Configuration.platform.poles;
+//            this.#pole.render(this.#model, angle);
+//            this.#horse.render(this.#model, angle, (this.#rotation + angle) * Configuration.horse.frequency);
+//        }
         requestAnimationFrame(this.render.bind(this));
     }
 
