@@ -157,7 +157,7 @@ class Carousel {
         for (let i = 0; i < Configuration.platform.poles; i++) {
             const angle = i * 2 * Math.PI / Configuration.platform.poles;
             this.#pole.render(this.#model, angle);
-            this.#horse.render(this.#model, angle, this.#rotation); // TODO unserstand how phase is related to rotation
+            this.#horse.render(this.#model, angle, (this.#rotation + angle) * Configuration.horse.frequency); // TODO unserstand how phase is related to rotation
         }
         requestAnimationFrame(this.render.bind(this));
     }

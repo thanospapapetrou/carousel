@@ -20,7 +20,7 @@ class Horse {
         mat4.multiply(model, model, parent);
         mat4.rotateY(model, model, angle);
         mat4.translate(model, model, [Configuration.poles.distance,
-            1.0 + Math.sin(phase + Configuration.horse.frequency * angle), 0.0]); // TODO
+            1.0 + Math.sin(phase), 0.0]); // TODO
         mat4.rotateY(model, model, Math.PI);
         return model;
     }
