@@ -155,9 +155,9 @@ class Carousel {
         this.#renderer.uniforms.light.directional.direction = Configuration.light.directional.direction;
         this.#platform.render();
         for (let i = 0; i < Configuration.platform.poles; i++) {
-            this.#renderer.uniforms.model = this.#poleModel(this.#model, i);
-            this.#pole.render();
-            this.#horse.render(this.#model, i, this.#rotation); // TODO this should be included in parent
+            const angle = i * 2 * Math.PI / Configuration.platform.poles;
+            this.#pole.render(this.#model, angle);
+            this.#horse.render(this.#model, angle, this.#rotation); // TODO unserstand how phase is related to rotation
         }
         requestAnimationFrame(this.render.bind(this));
     }
@@ -191,15 +191,6 @@ class Carousel {
     get #model() {
         const model = mat4.create();
         mat4.rotateY(model, model, this.rotation);
-        return model;
-    }
-
-    #poleModel(parent, i) {
-        const angle = i * 2 * Math.PI / Configuration.platform.poles;
-        const model = mat4.create();
-        mat4.multiply(model, model, parent);
-        mat4.translate(model, model, [Math.cos(angle) * Configuration.poles.distance,
-                Configuration.platform.base.height, Math.sin(angle) * Configuration.poles.distance]);
         return model;
     }
 }

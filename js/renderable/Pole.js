@@ -29,4 +29,17 @@ class Pole extends AbstractRenderable {
             return {positions, normals, colors, indices};
         })());
     }
+
+    render(parent, angle) {
+        this._renderer.uniforms.model = this.#model(parent, angle);
+        super.render();
+    }
+
+    #model(parent, angle) {
+        const model = mat4.create();
+        mat4.multiply(model, model, parent);
+        mat4.translate(model, model, [Math.cos(angle) * Configuration.poles.distance,
+                Configuration.platform.base.height, Math.sin(angle) * Configuration.poles.distance]);
+        return model;
+    }
 }

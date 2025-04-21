@@ -9,19 +9,18 @@ class Horse {
         this.#neck = new Neck(gl, renderer);
     }
 
-    render(parent, i, rotation) {
-        const model = this.#model(parent, i, rotation);
+    render(parent, angle, phase) {
+        const model = this.#model(parent, angle, phase);
         this.#body.render(model);
         this.#neck.render(model);
     }
 
-    #model(parent, i, rotation) {
-        const angle = i * 2 * Math.PI / Configuration.platform.poles;
+    #model(parent, angle, phase) {
         const model = mat4.create();
         mat4.multiply(model, model, parent);
         mat4.rotateY(model, model, angle);
         mat4.translate(model, model, [Configuration.poles.distance,
-            1.0 + Math.sin(rotation + Configuration.horse.frequency * angle), 0.0]); // TODO
+            1.0 + Math.sin(phase + Configuration.horse.frequency * angle), 0.0]); // TODO
         mat4.rotateY(model, model, Math.PI);
         return model;
     }
