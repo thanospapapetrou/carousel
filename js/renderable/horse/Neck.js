@@ -30,15 +30,16 @@ class Neck extends AbstractRenderable {
         })());
     }
 
-    render(parent) {
-        this._renderer.uniforms.model = this.#model(parent);
+    render(parent, phase) {
+        this._renderer.uniforms.model = this.#model(parent, phase);
         super.render();
     }
 
-    #model(parent) {
+    #model(parent, phase) {
         const model = mat4.create();
         mat4.multiply(model, model, parent);
         mat4.translate(model, model, [0.0, 0.0, Configuration.horse.body.length / 2 - Configuration.horse.neck.radius]);
+        mat4.rotateX(model, model, Math.sin(phase) * Math.PI / 6); // TODO
         return model;
     }
 }

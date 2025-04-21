@@ -14,7 +14,7 @@ class Horse {
     render(parent, angle, phase) {
         const model = this.#model(parent, angle, phase);
         this.#body.render(model);
-        this.#neck.render(model);
+        this.#neck.render(model, phase);
         this.#head.render(model);
     }
 
