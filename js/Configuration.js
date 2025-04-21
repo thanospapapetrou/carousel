@@ -73,6 +73,11 @@ const Configuration = Object.freeze({
             height: 0.5, // 0.5 m
             radius: 0.125, // 0.125 m
             sectors: 8
+        },
+        head: {
+            length: 0.5, // 0.5 m
+            radius: 0.125, // 0.125 m
+            sectors: 8
         }
     }
 });

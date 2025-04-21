@@ -3,16 +3,19 @@
 class Horse {
     #body;
     #neck;
+    #head;
 
     constructor(gl, renderer) {
         this.#body = new Body(gl, renderer);
         this.#neck = new Neck(gl, renderer);
+        this.#head = new Head(gl, renderer);
     }
 
     render(parent, angle, phase) {
         const model = this.#model(parent, angle, phase);
         this.#body.render(model);
         this.#neck.render(model);
+        this.#head.render(model);
     }
 
     #model(parent, angle, phase) {
